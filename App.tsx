@@ -1,4 +1,4 @@
-import "react-native-url-polyfill/auto"; //--- ALL OTHER IMPORTS GO BELOW THIS LINE ---
+import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { View, Text, SafeAreaView } from "react-native";
 
