@@ -33,11 +33,17 @@ def read_root():
 @app.get('/auth/session')
 def get_session():
     session = supabase.auth.get_session()
-
-    if session and session.get("access_token"):
-        return {"session": session}
-    else:
-        return {"session": None}
+    if not session:
+        return {"isLoggedIn": False, "session": None}
+    user = session.user if hasattr(session, 'user') else None
+    return {
+        "isLoggedIn": bool(user),
+        "session": {
+            "user": {
+                "email": user.email if user else None
+            }
+        } if user else None
+    }
 
 @app.get('/supabase/test')
 def test_supabase():
@@ -56,5 +62,21 @@ async def signup_user(request: SignUpRequest):
             return {"message": "User signed up successfully", "user": response.user}
         else:
             return {"error": "Failed to create user"}
+    except Exception as e:
+        return {"error": str(e)}
+    
+
+@app.post('/supabase/auth/signin')
+async def signin_user(request: SignUpRequest):
+    print(request.email)
+    try:
+        response = supabase.auth.sign_in({
+            "email": request.email,
+            "password": request.password
+        })
+        if response.user:
+            return {"message": "User signed in successfully", "user": response.user}
+        else:
+            return {"error": "Failed to sign in user"}
     except Exception as e:
         return {"error": str(e)}

@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-
-type RootStackParamList = {
-  SignUpScreen: undefined;
-  BrokenScreen: undefined;
-};
+import { RootStackParamList } from "../components/Navigation/MainNavigator";
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -15,27 +11,34 @@ const SplashScreen = () => {
     const checkLoginStatus = async () => {
       try {
         const API_URL = process.env.EXPO_PUBLIC_URL;
-        console.log("API URL:", API_URL);
-
         if (!API_URL) {
-          console.error("API_URL is not defined in environment variables");
-          setIsLoggedIn(false);
-          navigation.navigate("BrokenScreen");
-          return;
+          throw new Error("API_URL is not defined in environment variables");
         }
 
         const response = await fetch(`${API_URL}/auth/session`);
         if (!response.ok) {
-          throw new Error("Failed to fetch login status");
+          throw new Error(
+            `Failed to fetch login status: ${response.statusText}`
+          );
         }
-        const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn);
 
-        if (!data.isLoggedIn) {
+        const data = await response.json();
+        console.log("Session data:", data);
+
+        setIsLoggedIn(data.isLoggedIn);
+        if (data.isLoggedIn && data.session?.user?.email) {
+          navigation.navigate("Dashboard", {
+            email: data.session.user.email,
+            password: data.session.user.password,
+          });
+        } else {
           navigation.navigate("SignUpScreen");
         }
       } catch (error) {
-        console.error("Error checking login status:", error);
+        console.error(
+          "Error checking login status:",
+          error instanceof Error ? error.message : String(error)
+        );
         setIsLoggedIn(false);
         navigation.navigate("SignUpScreen");
       }
@@ -45,16 +48,36 @@ const SplashScreen = () => {
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>Buss'd</Text>
-      <Text style={{ fontSize: 18, fontWeight: "normal" }}>
-        How many bus routes have you taken?
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Buss'd</Text>
+      <Text style={styles.subtitle}>How many bus routes have you taken?</Text>
       {isLoggedIn === null && (
-        <Text style={{ marginTop: 20 }}>Checking login status...</Text>
+        <Text style={styles.loading}>Checking login status...</Text>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  loading: {
+    marginTop: 20,
+    color: "#666",
+  },
+});
 
 export default SplashScreen;

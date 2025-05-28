@@ -1,10 +1,17 @@
 module.exports = {
-  presets: [
-    "@react-native/babel-preset",
+  presets: ["module:@react-native/babel-preset"],
+  plugins: [
     [
-      "@babel/preset-typescript",
-      { allowDeclareFields: true, onlyRemoveTypeImports: true },
+      "module-resolver",
+      {
+        root: ["./src"],
+        extensions: [".ios.js", ".android.js", ".js", ".ts", ".tsx", ".json"],
+        alias: {
+          "@components": "./src/components",
+          "@screens": "./screens",
+          "@utils": "./src/utils",
+        },
+      },
     ],
   ],
-  plugins: ["@babel/plugin-transform-flow-strip-types"],
 };
