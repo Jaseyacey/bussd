@@ -72,15 +72,22 @@ async def signup_user(request: SignUpRequest):
     
 @app.post('/supabase/auth/signin')
 async def signin_user(request: SignUpRequest):
-    print(request.email)
+    print("Attempting to sign in:", request.email)
     try:
-        response = supabase.auth.sign_in({
+        response = supabase.auth.sign_in_with_password({
             "email": request.email,
             "password": request.password
         })
+        print("Sign in response:", response)
         if response.user:
             return {"message": "User signed in successfully", "user": response.user}
         else:
             return {"error": "Failed to sign in user"}
     except Exception as e:
+        print("Sign in error:", str(e))
         return {"error": str(e)}
+
+@app.post('/supabase/auth/signout')
+async def signout_user():
+    supabase.auth.sign_out()
+    return {"message": "User signed out successfully"}

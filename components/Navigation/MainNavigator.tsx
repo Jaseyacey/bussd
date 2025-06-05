@@ -1,14 +1,13 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import SplashScreen from "../../screens/Splashscreen";
-import SignUpScreen from "../../screens/SignUpScreen";
 import DashboardScreen from "../../screens/DashboardScreen";
+import Auth from "../../src/lib/components/Auth";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
-  SignUpScreen: undefined;
+  Auth: undefined;
   Dashboard: {
     email: string;
-    password: string;
   };
 };
 
@@ -23,7 +22,7 @@ const MainNavigator = () => {
       }}
     >
       <Stack.Screen name="SplashScreen" component={SplashScreen} />
-      <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
+      <Stack.Screen name="Auth" component={Auth} />
       <Stack.Screen name="Dashboard" component={DashboardScreen} />
     </Stack.Navigator>
   );
