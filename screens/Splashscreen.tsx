@@ -23,16 +23,13 @@ const SplashScreen = () => {
         }
 
         const data = await response.json();
-        console.log("Session data:", data);
-
         setIsLoggedIn(data.isLoggedIn);
         if (data.isLoggedIn && data.session?.user?.email) {
           navigation.navigate("Dashboard", {
             email: data.session.user.email,
-            password: data.session.user.password,
           });
         } else {
-          navigation.navigate("SignUpScreen");
+          navigation.navigate("Auth");
         }
       } catch (error) {
         console.error(
@@ -40,7 +37,7 @@ const SplashScreen = () => {
           error instanceof Error ? error.message : String(error)
         );
         setIsLoggedIn(false);
-        navigation.navigate("SignUpScreen");
+        navigation.navigate("Auth");
       }
     };
 

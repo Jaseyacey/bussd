@@ -1,12 +1,21 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
-
-type DashboardScreenRouteProp = RouteProp<RootStackParamList, "Dashboard">;
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 const DashboardScreen = () => {
-  const route = useRoute<DashboardScreenRouteProp>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const signOut = async () => {
+    fetch(`${process.env.EXPO_PUBLIC_URL}/supabase/auth/signout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
+
+  const route = useRoute<RouteProp<RootStackParamList, "Dashboard">>();
   const { email } = route.params;
 
   return (
@@ -16,6 +25,12 @@ const DashboardScreen = () => {
       <Text style={styles.text}>
         You've successfully signed up and logged in.
       </Text>
+      <Button
+        title="Sign out"
+        onPress={() => {
+          signOut();
+        }}
+      />
     </View>
   );
 };

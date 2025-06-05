@@ -1,88 +1,191 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, View, AppState } from "react-native";
-import { Button, Input } from "@rneui/themed";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  AppState,
+  ActivityIndicator,
+} from "react-native";
+import { Button, Input, Text } from "@rneui/themed";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../../components/Navigation/MainNavigator";
+import { API_URL } from "../constants/config";
+import {
+  validateEmail,
+  validatePassword,
+  getPasswordRequirements,
+  validateConfirmPassword,
+} from "../utils/validation";
 
-// AppState.addEventListener("change", (state) => {
-//   if (state === "active") {
-//     supabase.auth.startAutoRefresh();
-//   } else {
-//     supabase.auth.stopAutoRefresh();
-//   }
-// });
-
-// export default function Auth() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [loading, setLoading] = useState(false);
-
-//   async function signInWithEmail() {
-//     setLoading(true);
-//     const { error } = await supabase.auth.signInWithPassword({
-//       email: email,
-//       password: password,
-//     });
-
-//     if (error) Alert.alert(error.message);
-//     setLoading(false);
-//   }
-
-//   async function signUpWithEmail() {
-//     setLoading(true);
-//     const {
-//       data: { session },
-//       error,
-//     } = await supabase.auth.signUp({
-//       email: email,
-//       password: password,
-//     });
-
-//     if (error) Alert.alert(error.message);
-//     if (!session)
-//       Alert.alert("Please check your inbox for email verification!");
-//     setLoading(false);
-//   }
+interface FormErrors {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
 export default function Auth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const signInWithEmail = () => {};
-  const signUpWithEmail = () => {};
+
+  const validateForm = () => {
+    const newErrors: FormErrors = {};
+
+    if (!form.email) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(form.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (!form.password) {
+      newErrors.password = "Password is required";
+    } else if (!validatePassword(form.password)) {
+      newErrors.password = getPasswordRequirements();
+    }
+
+    if (
+      form.confirmPassword &&
+      !validateConfirmPassword(form.password, form.confirmPassword)
+    ) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const signInWithEmail = async () => {
+    if (!validateForm()) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/supabase/auth/signin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData);
+      }
+      const { user } = await response.json();
+      navigation.navigate("Dashboard", {
+        email: user.email,
+      });
+    } catch (error) {
+      setErrors({
+        email: "Invalid email or password",
+        password: "Invalid email or password",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUpWithEmail = async () => {
+    if (!validateForm()) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/supabase/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData);
+      }
+
+      const data = await response.json();
+      Alert.alert(
+        "Sign up successful",
+        "Your account has been created. You can now sign in."
+      );
+      await signInWithEmail();
+    } catch (error: any) {
+      const errorMessage =
+        error.message || "Failed to sign up. Please try again.";
+      setErrors({
+        email: errorMessage,
+        password: errorMessage,
+        confirmPassword: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input
           label="Email"
-          leftIcon={{ type: "font-awesome", name: "envelope" }}
-          onChangeText={(text) => setEmail(text)}
-          value={email}
+          leftIcon={{ type: "font-awesome", name: "envelope", size: 24 }}
+          onChangeText={(text) => setForm({ ...form, email: text })}
+          value={form.email}
+          errorMessage={errors.email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
+          disabled={loading}
         />
       </View>
       <View style={styles.verticallySpaced}>
         <Input
           label="Password"
-          leftIcon={{ type: "font-awesome", name: "lock" }}
-          onChangeText={(text) => setPassword(text)}
-          value={password}
+          leftIcon={{ type: "font-awesome", name: "lock", size: 24 }}
+          onChangeText={(text) => setForm({ ...form, password: text })}
+          value={form.password}
+          errorMessage={errors.password}
           secureTextEntry={true}
           placeholder="Password"
           autoCapitalize={"none"}
+          disabled={loading}
+        />
+        <Input
+          label="Confirm Password"
+          leftIcon={{ type: "font-awesome", name: "lock", size: 24 }}
+          onChangeText={(text) => setForm({ ...form, confirmPassword: text })}
+          value={form.confirmPassword}
+          errorMessage={errors.confirmPassword}
+          secureTextEntry={true}
+          placeholder="Password"
+          autoCapitalize={"none"}
+          disabled={loading}
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
-          title="Sign in"
+          title={loading ? "Signing in..." : "Sign in"}
           disabled={loading}
-          onPress={() => signInWithEmail()}
+          onPress={signInWithEmail}
+          icon={loading ? <ActivityIndicator color="white" /> : undefined}
         />
       </View>
       <View style={styles.verticallySpaced}>
         <Button
           title="Sign up"
           disabled={loading}
-          onPress={() => signUpWithEmail()}
+          onPress={() => {
+            signUpWithEmail();
+          }}
         />
       </View>
     </View>
