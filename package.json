@@ -10,24 +10,37 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-navigation/native": "^7.1.10",
+    "@react-navigation/stack": "^7.3.2",
     "@rneui/themed": "^4.0.0-rc.8",
     "@supabase/supabase-js": "^2.49.8",
+    "axios": "^1.9.0",
     "expo": "~53.0.9",
     "expo-status-bar": "~2.2.3",
+    "metro-react-native-babel-preset": "^0.77.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-dotenv": "^3.4.11",
+    "react-native-gesture-handler": "^2.25.0",
+    "react-native-safe-area-context": "^5.4.1",
+    "react-native-screens": "^4.11.0",
     "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.27.3",
     "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@babel/plugin-transform-flow-strip-types": "^7.27.1",
     "@babel/plugin-transform-private-methods": "^7.27.1",
     "@babel/plugin-transform-private-property-in-object": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@babel/runtime": "^7.27.3",
+    "@react-native/babel-preset": "^0.79.2",
     "@types/react": "~19.0.10",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "metro-react-native-babel-preset": "^0.77.0",
-    "typescript": "~5.8.3",
-    "babel-plugin-transform-remove-console": "^6.9.4"
+    "typescript": "~5.8.3"
   },
   "private": true
 }

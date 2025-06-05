@@ -41,6 +41,7 @@ import { Button, Input } from "@rneui/themed";
 //       Alert.alert("Please check your inbox for email verification!");
 //     setLoading(false);
 //   }
+
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
