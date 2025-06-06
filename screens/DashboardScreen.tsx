@@ -11,7 +11,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { ListItem } from "@rneui/base";
-import BottomTab from "src/components/BottomTab";
+import BottomTab from "../src/components/BottomTab";
 
 interface StopPoint {
   name: string;

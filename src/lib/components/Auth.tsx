@@ -3,7 +3,6 @@ import { Alert, StyleSheet, View, TouchableOpacity } from "react-native";
 import { Button, Input, Text } from "@rneui/themed";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../components/Navigation/MainNavigator";
-import { API_URL } from "../constants/config";
 import {
   validateEmail,
   validatePassword,
@@ -26,7 +25,7 @@ export default function Auth() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-
+  const API_URL = process.env.EXPO_PUBLIC_URL;
   const validateForm = () => {
     const newErrors: FormErrors = {};
 

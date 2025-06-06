@@ -5,13 +5,14 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import { NavigationProp } from "@react-navigation/native";
 import axios from "axios";
-import { API_URL } from "src/lib/constants/config";
 
 const SignInScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
   const signIn = () => {
+    const API_URL = process.env.EXPO_PUBLIC_URL;
     axios
       .post(`${API_URL}/supabase/auth/signin`, {
         email: email,
