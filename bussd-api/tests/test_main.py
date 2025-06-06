@@ -30,6 +30,12 @@ def test_supabase_test_failure(test_client, mock_supabase):
     assert response.status_code == 200  # FastAPI returns 200 even for handled errors
     assert "error" in response.json()
 
+def test_supabase_test_missing_credentials(test_client_no_supabase):
+    response = test_client_no_supabase.get("/supabase/test")
+    
+    assert response.status_code == 200
+    assert response.json() == {"error": "Supabase credentials not found in environment variables"}
+
 @pytest.fixture
 def clear_env_vars(monkeypatch):
     # Save original environment variables

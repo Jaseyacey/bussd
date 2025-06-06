@@ -41,9 +41,7 @@ def test_client(mock_supabase):
         yield client
 
 @pytest.fixture
-def clear_supabase(monkeypatch):
-    """Fixture to clear Supabase environment variables and client"""
-    # Save original environment variables
+def test_client_no_supabase(monkeypatch):
     original_url = os.environ.get('SUPABASE_URL')
     original_key = os.environ.get('SUPABASE_ANON_KEY')
     
@@ -55,10 +53,10 @@ def clear_supabase(monkeypatch):
     with patch('main.supabase', None), \
          patch('main.create_client', return_value=None), \
          patch('main.SUPABASE_URL', None), \
-         patch('main.SUPABASE_KEY', None):
-        yield
+         patch('main.SUPABASE_KEY', None), \
+         TestClient(app) as client:
+        yield client
     
-    # Restore original environment variables if they existed
     if original_url:
         monkeypatch.setenv('SUPABASE_URL', original_url)
     if original_key:
