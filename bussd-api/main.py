@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from typing import Optional
 
 load_dotenv()
 
@@ -12,7 +13,7 @@ class SignUpRequest(BaseModel):
     password: str
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_ANON_KEY")
 
 app = FastAPI()
 
@@ -24,7 +25,19 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# Only create Supabase client if credentials are available
+supabase: Optional[Client] = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as e:
+        print(f"Failed to create Supabase client: {e}")
+
+def check_supabase_credentials():
+    """Check if Supabase credentials are available"""
+    if not SUPABASE_URL or not SUPABASE_KEY or not supabase:
+        return {"error": "Supabase credentials not found in environment variables"}
+    return None
 
 @app.get('/')
 def read_root():
@@ -32,6 +45,10 @@ def read_root():
 
 @app.get('/auth/session')
 def get_session():
+    error = check_supabase_credentials()
+    if error:
+        return error
+    
     session = supabase.auth.get_session()
     if not session:
         return {"isLoggedIn": False, "session": None}
@@ -47,8 +64,9 @@ def get_session():
 
 @app.get('/supabase/test')
 def test_supabase():
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return {"error": "Supabase credentials not found in environment variables"}
+    error = check_supabase_credentials()
+    if error:
+        return error
     
     try:
         data = supabase.table('test_table').select('*').execute()
@@ -58,6 +76,10 @@ def test_supabase():
 
 @app.post('/supabase/auth/signup')
 async def signup_user(request: SignUpRequest):
+    error = check_supabase_credentials()
+    if error:
+        return error
+    
     try:
         response = supabase.auth.sign_up({
             "email": request.email,
@@ -72,6 +94,10 @@ async def signup_user(request: SignUpRequest):
     
 @app.post('/supabase/auth/signin')
 async def signin_user(request: SignUpRequest):
+    error = check_supabase_credentials()
+    if error:
+        return error
+    
     print("Attempting to sign in:", request.email)
     try:
         response = supabase.auth.sign_in_with_password({
@@ -89,5 +115,9 @@ async def signin_user(request: SignUpRequest):
 
 @app.post('/supabase/auth/signout')
 async def signout_user():
+    error = check_supabase_credentials()
+    if error:
+        return error
+    
     supabase.auth.sign_out()
     return {"message": "User signed out successfully"}
