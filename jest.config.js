@@ -1,19 +1,9 @@
 module.exports = {
-  preset: "jest-expo",
-  transform: {
-    "^.+\\.[jt]sx?$": "babel-jest",
-  },
+  preset: "react-native",
+  setupFiles: ["<rootDir>/jest.setup.js"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  testEnvironment: "node",
   transformIgnorePatterns: [
-    "node_modules/(?!(react-native" +
-      "|@react-native" +
-      "|@react-navigation" +
-      "|@react-native-community" +
-      "|expo" +
-      "|expo-modules-core" +
-      "|native-base" +
-      "|sentry-expo" +
-      "|react-native-svg" +
-      ")/)",
+    "node_modules/(?!(jest-expo|react-native|@react-native|expo(nent)?|@expo(nent)?|@react-navigation|react-native-vector-icons|@rneui)/)",
   ],
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
