@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  StyleSheet,
-  View,
-  AppState,
-  ActivityIndicator,
-} from "react-native";
+import { Alert, StyleSheet, View, TouchableOpacity } from "react-native";
 import { Button, Input, Text } from "@rneui/themed";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../components/Navigation/MainNavigator";
@@ -82,6 +76,7 @@ export default function Auth() {
       const { user } = await response.json();
       navigation.navigate("Dashboard", {
         email: user.email,
+        user_uuid: user.id,
       });
     } catch (error) {
       setErrors({
@@ -173,10 +168,11 @@ export default function Auth() {
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
-          title={loading ? "Signing in..." : "Sign in"}
-          disabled={loading}
-          onPress={signInWithEmail}
-          icon={loading ? <ActivityIndicator color="white" /> : undefined}
+          title="Already have an account? Sign in here."
+          type="clear"
+          onPress={() => navigation.navigate("SignInScreen")}
+          containerStyle={{ marginVertical: 10 }}
+          titleStyle={{ color: "#007bff", textDecorationLine: "underline" }}
         />
       </View>
       <View style={styles.verticallySpaced}>
