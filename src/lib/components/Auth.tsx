@@ -167,9 +167,13 @@ export default function Auth() {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TouchableOpacity onPress={() => navigation.navigate("SignInScreen")}>
-          <Text>Already have an account? Sign in here.</Text>
-        </TouchableOpacity>
+        <Button
+          title="Already have an account? Sign in here."
+          type="clear"
+          onPress={() => navigation.navigate("SignInScreen")}
+          containerStyle={{ marginVertical: 10 }}
+          titleStyle={{ color: "#007bff", textDecorationLine: "underline" }}
+        />
       </View>
       <View style={styles.verticallySpaced}>
         <Button
