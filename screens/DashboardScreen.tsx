@@ -56,7 +56,7 @@ const DashboardScreen = () => {
           ]}
           style={styles.list}
           renderItem={({ item }) => (
-            <ListItem key={item.id}>
+            <ListItem key={item.id} onPress={() => {}}>
               <ListItem.Content style={styles.listItem}>
                 <ListItem.Title>{item.title}</ListItem.Title>
                 <ListItem.Subtitle>{item.percentageTaken}%</ListItem.Subtitle>
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    backgroundColor: "red",
+    backgroundColor: "#007AFF",
     padding: 20,
   },
   list: {
