@@ -27,6 +27,7 @@ const SplashScreen = () => {
         if (data.isLoggedIn && data.session?.user?.email) {
           navigation.navigate("Dashboard", {
             email: data.session.user.email,
+            user_uuid: data.session.user.id,
           });
         } else {
           navigation.navigate("Auth");
