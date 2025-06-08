@@ -5,6 +5,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from typing import Optional
+from dashboard.dashboard import app as dashboard_app
 
 load_dotenv()
 
@@ -24,6 +25,9 @@ app.add_middleware(
     allow_methods=["*"], 
     allow_headers=["*"], 
 )
+
+# Mount the dashboard routes
+app.mount("/api/dashboard", dashboard_app)
 
 # Only create Supabase client if credentials are available
 supabase: Optional[Client] = None
@@ -57,7 +61,8 @@ def get_session():
         "isLoggedIn": bool(user),
         "session": {
             "user": {
-                "email": user.email if user else None
+                "email": user.email if user else None,
+                "id": user.id if user else None
             }
         } if user else None
     }

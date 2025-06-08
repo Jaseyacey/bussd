@@ -1,30 +1,18 @@
-import { Icon } from "@rneui/base";
 import { View, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const BottomTab = () => {
   return (
     <View style={styles.container}>
-      <Icon
-        name="home"
-        size={24}
-        color="black"
-        type="material"
-        containerStyle={styles.icon}
-      />
-      <Icon
-        name="search"
-        size={24}
-        color="black"
-        type="material"
-        containerStyle={styles.icon}
-      />
-      <Icon
-        name="user"
-        size={24}
-        color="black"
-        type="material"
-        containerStyle={styles.icon}
-      />
+      <View style={styles.icon}>
+        <Icon name="home" size={24} color="black" />
+      </View>
+      <View style={styles.icon}>
+        <Icon name="search" size={24} color="black" />
+      </View>
+      <View style={styles.icon}>
+        <Icon name="user" size={24} color="black" />
+      </View>
     </View>
   );
 };

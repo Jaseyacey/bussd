@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,59 +10,71 @@ import {
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { ListItem } from "@rneui/base";
 import BottomTab from "../src/components/BottomTab";
 
-interface StopPoint {
-  name: string;
-  id: string;
-  lat: number;
-  lon: number;
-  stopLetter?: string;
-  towards?: string;
+interface RouteData {
+  bus_route: string;
+  id: number;
+  title: string;
+  percentage_travelled: number;
 }
 
 const DashboardScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const signOut = async () => {
-    fetch(`${process.env.EXPO_PUBLIC_URL}/supabase/auth/signout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  };
+  const [routes, setRoutes] = useState<RouteData[]>([]);
 
   const route = useRoute<RouteProp<RootStackParamList, "Dashboard">>();
-  const { email } = route.params;
+  const { user_uuid } = route.params;
+  useEffect(() => {
+    fetch(
+      `${process.env.EXPO_PUBLIC_URL}/api/dashboard/routes/?user_uuid=${user_uuid}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        data.routes && data.routes.length > 0
+          ? setRoutes(data.routes)
+          : console.log("data", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching routes:", error);
+      });
+  }, [user_uuid]);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Bus routes taken</Text>
+        <Text testID="header" style={styles.title}>
+          Bus routes taken
+        </Text>
       </View>
       <View style={styles.listContainer}>
         <FlatList
-          data={[
-            { id: 1, title: "Route 1", percentageTaken: 1 },
-            { id: 2, title: "Route 2", percentageTaken: 100 },
-            { id: 3, title: "Route 3", percentageTaken: 50 },
-            { id: 4, title: "Route 4", percentageTaken: 100 },
-            { id: 5, title: "Route 5", percentageTaken: 23 },
-            { id: 6, title: "Route 6", percentageTaken: 100 },
-            { id: 7, title: "Route 7", percentageTaken: 100 },
-            { id: 8, title: "Route 8", percentageTaken: 100 },
-            { id: 9, title: "Route 9", percentageTaken: 100 },
-          ]}
+          data={routes}
+          keyExtractor={(item) => item.id.toString()}
           style={styles.list}
+          ListEmptyComponent={() => (
+            <View testID="noRoutesContainer" style={styles.noRoutesContainer}>
+              <Text testID="noRoutesText" style={styles.noRoutesText}>
+                Add a route to get started
+              </Text>
+              <Button
+                testID="addRouteButton"
+                title="Add route"
+                onPress={() => {}}
+              />
+            </View>
+          )}
           renderItem={({ item }) => (
-            <ListItem key={item.id} onPress={() => {}}>
-              <ListItem.Content style={styles.listItem}>
-                <ListItem.Title>{item.title}</ListItem.Title>
-                <ListItem.Subtitle>{item.percentageTaken}%</ListItem.Subtitle>
-                <ListItem.Chevron />
-              </ListItem.Content>
-            </ListItem>
+            <View testID="listItem" key={item.id} style={styles.listItem}>
+              <Text>{item.bus_route}</Text>
+              <Text>{item.percentage_travelled} %</Text>
+            </View>
           )}
         />
       </View>
@@ -90,13 +102,27 @@ const styles = StyleSheet.create({
   },
   list: {
     width: "100%",
-    backgroundColor: "green",
+    height: "100%",
+    backgroundColor: "red",
     padding: 20,
+  },
+  noRoutesText: {
+    fontSize: 16,
+    color: "black",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
   },
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  noRoutesContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "green",
   },
   listContainer: {
     flex: 1,
