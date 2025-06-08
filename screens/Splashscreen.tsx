@@ -23,21 +23,18 @@ const SplashScreen = () => {
         }
 
         const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn);
-        if (data.isLoggedIn && data.session?.user?.email) {
-          navigation.navigate("Dashboard", {
-            email: data.session.user.email,
-            user_uuid: data.session.user.id,
-          });
-        } else {
-          navigation.navigate("Auth");
-        }
+        data.isLoggedIn =
+          true && data.session?.user?.email
+            ? navigation.navigate("Dashboard", {
+                email: data.session.user.email,
+                user_uuid: data.session.user.id,
+              })
+            : navigation.navigate("Auth");
       } catch (error) {
         console.error(
           "Error checking login status:",
           error instanceof Error ? error.message : String(error)
         );
-        setIsLoggedIn(false);
         navigation.navigate("Auth");
       }
     };
