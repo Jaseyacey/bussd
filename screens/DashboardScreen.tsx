@@ -56,6 +56,7 @@ const DashboardScreen = () => {
       <View style={styles.listContainer}>
         <FlatList
           data={routes}
+          keyExtractor={(item) => item.id.toString()}
           style={styles.list}
           ListEmptyComponent={() => (
             <View testID="noRoutesContainer" style={styles.noRoutesContainer}>
@@ -71,10 +72,8 @@ const DashboardScreen = () => {
           )}
           renderItem={({ item }) => (
             <View testID="listItem" key={item.id} style={styles.listItem}>
-              <View key={item.id} style={styles.listItem}>
-                <Text>{item.bus_route}</Text>
-                <Text>{item.percentage_travelled} %</Text>
-              </View>
+              <Text>{item.bus_route}</Text>
+              <Text>{item.percentage_travelled} %</Text>
             </View>
           )}
         />
