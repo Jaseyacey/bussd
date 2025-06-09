@@ -98,13 +98,15 @@ async def stops_between(route_id: str, from_stop_id: str, to_stop_id: str, direc
 
 
 @app.post("/add-bus-route")
-async def add_bus_route(bus_route: str, percentage: int, user_uuid: str):
+async def add_bus_route(bus_route: str, percentage: int, user_uuid: str, started_stop: str, ended_stop: str):
     require_supabase()
 
     try:
         response = supabase.table("bus_routes_taken").insert({
             "bus_route": bus_route,
             "percentage_travelled": percentage,
+            "started_stop": started_stop,
+            "ended_stop": ended_stop,
             "user_uuid": user_uuid,
             "bus_route_taken": True
         }).execute()

@@ -69,7 +69,7 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
       const percentage = Math.round((count / all_stop_ids.length) * 100);
 
       const addRes = await fetch(
-        `${API_URL}/api/tfl/add-bus-route?bus_route=${routeId}&percentage=${percentage}&user_uuid=${userUuid}`,
+        `${API_URL}/api/tfl/add-bus-route?bus_route=${routeId}&percentage=${percentage}&user_uuid=${userUuid}&started_stop=${stop1}&ended_stop=${stop2}`,
         { method: "POST", headers: { "Content-Type": "application/json" } }
       );
 
