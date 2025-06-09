@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -23,6 +24,7 @@ const SplashScreen = () => {
         }
 
         const data = await response.json();
+        await AsyncStorage.setItem("user_uuid", data.session.user.id);
         data.isLoggedIn =
           true && data.session?.user?.email
             ? navigation.navigate("Dashboard", {

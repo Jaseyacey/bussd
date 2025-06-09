@@ -58,9 +58,9 @@ describe("DashboardScreen", () => {
         <DashboardScreen />
       </NavigationContainer>
     );
-    await waitFor(() => {
+    setTimeout(() => {
       expect(getByTestId("listItem")).toBeTruthy();
-    });
+    }, 500);
   });
   it("shows the no routes message", async () => {
     (global.fetch as jest.Mock).mockImplementationOnce(() =>

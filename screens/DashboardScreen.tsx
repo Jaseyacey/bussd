@@ -11,6 +11,8 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import BottomTab from "../src/components/BottomTab";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from "../src/lib/constants/config";
 
 interface RouteData {
   bus_route: string;
@@ -22,29 +24,37 @@ interface RouteData {
 const DashboardScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [userUuid, setUserUuid] = useState<string | null>(null);
 
-  const route = useRoute<RouteProp<RootStackParamList, "Dashboard">>();
-  const { user_uuid } = route.params;
   useEffect(() => {
-    fetch(
-      `${process.env.EXPO_PUBLIC_URL}/api/dashboard/routes/?user_uuid=${user_uuid}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    const getUserUuid = async () => {
+      const uuid = await AsyncStorage.getItem("user_uuid");
+      setUserUuid(uuid);
+    };
+    getUserUuid();
+  }, []);
+
+  useEffect(() => {
+    if (!userUuid) return;
+
+    fetch(`${API_URL}/api/dashboard/routes/?user_uuid=${userUuid}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
-        data.routes && data.routes.length > 0
-          ? setRoutes(data.routes)
-          : console.log("data", data);
+        if (data.routes && data.routes.length > 0) {
+          setRoutes(data.routes);
+        } else {
+          console.log("No routes found:", data);
+        }
       })
       .catch((error) => {
         console.error("Error fetching routes:", error);
       });
-  }, [user_uuid]);
+  }, [userUuid]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,7 +76,7 @@ const DashboardScreen = () => {
               <Button
                 testID="addRouteButton"
                 title="Add route"
-                onPress={() => {}}
+                onPress={() => navigation.navigate("AddBusRoute")}
               />
             </View>
           )}
