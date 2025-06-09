@@ -8,7 +8,6 @@ import {
   FlatList,
   StatusBar,
 } from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import BottomTab from "../src/components/BottomTab";
@@ -60,7 +59,7 @@ const DashboardScreen = () => {
   }, [userUuid]);
 
   const renderItem = ({ item }: { item: RouteData }) => (
-    <View testID="listItem" key={item.id} style={styles.listItem}>
+    <View testID="listItem" style={styles.listItem}>
       <View style={styles.routeInfo}>
         <View style={styles.routeNumberBox}>
           <Text style={styles.routeNumber}>{item.bus_route}</Text>
