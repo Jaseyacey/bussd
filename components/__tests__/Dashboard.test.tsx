@@ -92,5 +92,15 @@ describe("DashboardScreen", () => {
       expect(getByTestId("addRouteButton")).toBeTruthy();
     });
   });
-  it.todo("navigates to the add route screen");
+    it("navigates to the add route screen", async () => {
+    const { getByTestId } = render(
+      <NavigationContainer>
+        <DashboardScreen />
+      </NavigationContainer>
+    );
+    fireEvent.press(getByTestId("addRouteButton"));
+    setTimeout(() => {
+      expect(mockNavigation.navigate).toHaveBeenCalledWith("AddRoute");
+    }, 500);
+  });
 });
