@@ -1,5 +1,5 @@
 import React from "react";
-import { render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import DashboardScreen from "../../screens/DashboardScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import {
@@ -92,7 +92,7 @@ describe("DashboardScreen", () => {
       expect(getByTestId("addRouteButton")).toBeTruthy();
     });
   });
-    it("navigates to the add route screen", async () => {
+  it("navigates to the add route screen", async () => {
     const { getByTestId } = render(
       <NavigationContainer>
         <DashboardScreen />
