@@ -30,7 +30,6 @@ const DashboardScreen = () => {
     const getUserUuid = async () => {
       const uuid = await AsyncStorage.getItem("user_uuid");
       setUserUuid(uuid);
-      console.log("user_uuid___________", uuid);
     };
     getUserUuid();
   }, []);
