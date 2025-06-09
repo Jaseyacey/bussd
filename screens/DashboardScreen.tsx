@@ -6,6 +6,7 @@ import {
   Button,
   SafeAreaView,
   FlatList,
+  StatusBar,
 } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
@@ -18,6 +19,8 @@ interface RouteData {
   bus_route: string;
   id: number;
   title: string;
+  started_stop: string;
+  ended_stop: string;
   percentage_travelled: number;
 }
 
@@ -56,8 +59,20 @@ const DashboardScreen = () => {
       });
   }, [userUuid]);
 
+  const renderItem = ({ item }: { item: RouteData }) => (
+    <View testID="listItem" key={item.id} style={styles.listItem}>
+      <View style={styles.routeInfo}>
+        <View style={styles.routeNumberBox}>
+          <Text style={styles.routeNumber}>{item.bus_route}</Text>
+        </View>
+      </View>
+      <Text style={styles.percentage}>{item.percentage_travelled}%</Text>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#007AFF" />
       <View style={styles.header}>
         <Text testID="header" style={styles.title}>
           Bus routes taken
@@ -77,15 +92,11 @@ const DashboardScreen = () => {
                 testID="addRouteButton"
                 title="Add route"
                 onPress={() => navigation.navigate("AddBusRoute")}
+                color="#007AFF"
               />
             </View>
           )}
-          renderItem={({ item }) => (
-            <View testID="listItem" key={item.id} style={styles.listItem}>
-              <Text>{item.bus_route}</Text>
-              <Text>{item.percentage_travelled} %</Text>
-            </View>
-          )}
+          renderItem={renderItem}
         />
       </View>
       <View style={styles.footer}>
@@ -98,81 +109,86 @@ const DashboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
+    backgroundColor: "#FFFFFF",
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    backgroundColor: "#007AFF",
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    backgroundColor: "#FFFFFF",
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: "bold",
+    color: "#000000",
+  },
+  listContainer: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: "hidden",
   },
   list: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "red",
-    padding: 20,
-  },
-  noRoutesText: {
-    fontSize: 16,
-    color: "black",
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 20,
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0, 0, 0, 0.1)",
+  },
+  routeInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  routeNumberBox: {
+    backgroundColor: "#F5F7FA",
+    borderRadius: 8,
+    width: 70,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  routeNumber: {
+    fontSize: 20,
+    color: "#000000",
+    fontWeight: "600",
+  },
+  destination: {
+    fontSize: 16,
+    color: "#000000",
+    fontWeight: "400",
+  },
+  percentage: {
+    fontSize: 20,
+    color: "#000000",
+    fontWeight: "600",
   },
   noRoutesContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "green",
-  },
-  listContainer: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: "blue",
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  subtitle: {
+  noRoutesText: {
     fontSize: 18,
-    marginBottom: 20,
-  },
-  text: {
-    fontSize: 16,
-    color: "#666",
+    color: "#000000",
+    fontWeight: "500",
+    marginBottom: 16,
+    opacity: 0.9,
   },
   footer: {
-    width: "100%",
-    backgroundColor: "yellow",
-    padding: 20,
-  },
-  addButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "blue",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "black",
-    fontSize: 16,
-    fontWeight: "bold",
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 0,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
   },
 });
 

@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "components/Navigation/MainNavigator";
@@ -7,22 +7,26 @@ const BottomTab = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   return (
     <View style={styles.container}>
-      <View style={styles.icon}>
-        <Icon name="home" size={24} color="black" />
-      </View>
-      <View style={styles.icon}>
-        <Icon
-          name="search"
-          size={24}
-          color="black"
-          onPress={() => {
-            navigation.navigate("AddBusRoute");
-          }}
-        />
-      </View>
-      <View style={styles.icon}>
-        <Icon name="user" size={24} color="black" />
-      </View>
+      <Pressable
+        style={styles.tabButton}
+        onPress={() =>
+          navigation.navigate("Dashboard", { email: "", user_uuid: "" })
+        }
+      >
+        <Icon name="home" size={24} color="#000000" />
+      </Pressable>
+      <Pressable
+        style={styles.tabButton}
+        onPress={() => navigation.navigate("AddBusRoute")}
+      >
+        <Icon name="search" size={24} color="#000000" />
+      </Pressable>
+      <Pressable
+        style={styles.tabButton}
+        onPress={() => navigation.navigate("SignInScreen")}
+      >
+        <Icon name="user" size={24} color="#000000" />
+      </Pressable>
     </View>
   );
 };
@@ -30,17 +34,21 @@ const BottomTab = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "red",
+    backgroundColor: "#FFFFFF",
     width: "100%",
-    height: 50,
+    height: 60,
+    paddingBottom: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
   },
-  icon: {
+  tabButton: {
     alignItems: "center",
     justifyContent: "center",
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 44,
+    borderRadius: 22,
   },
 });
 
