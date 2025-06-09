@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from typing import Optional
 from dashboard.dashboard import app as dashboard_app
+from tflApi.tflapi import app as tfl_app
 
 load_dotenv()
 
@@ -28,6 +29,7 @@ app.add_middleware(
 
 # Mount the dashboard routes
 app.mount("/api/dashboard", dashboard_app)
+app.mount("/api/tfl", tfl_app)
 
 # Only create Supabase client if credentials are available
 supabase: Optional[Client] = None

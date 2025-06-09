@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import SplashScreen from "../../screens/Splashscreen";
 import DashboardScreen from "../../screens/DashboardScreen";
 import SignInScreen from "../../screens/SignInScreen.tsx";
+import AddBusRoute from "../../screens/AddBusRoute";
 import Auth from "../../src/lib/components/Auth";
 
 export type RootStackParamList = {
@@ -12,6 +13,7 @@ export type RootStackParamList = {
     user_uuid: string;
   };
   SignInScreen: undefined;
+  AddBusRoute: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -28,6 +30,7 @@ const MainNavigator = () => {
       <Stack.Screen name="Auth" component={Auth} />
       <Stack.Screen name="Dashboard" component={DashboardScreen} />
       <Stack.Screen name="SignInScreen" component={SignInScreen} />
+      <Stack.Screen name="AddBusRoute" component={AddBusRoute} />
     </Stack.Navigator>
   );
 };

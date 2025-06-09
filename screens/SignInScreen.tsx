@@ -8,9 +8,9 @@ import axios from "axios";
 const SignInScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("jbeedle@gmail.com");
 
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("Padres756");
   const signIn = () => {
     setLoading(true);
     const API_URL = process.env.EXPO_PUBLIC_URL;
