@@ -83,13 +83,13 @@ async def stops_between(route_id: str, from_stop_id: str, to_stop_id: str, direc
     stop_ids = [stop["id"] for stop in stops]
 
     try:
-        i1 = stop_ids.index(from_stop_id)
-        i2 = stop_ids.index(to_stop_id)
-        between = stop_ids[min(i1, i2)+1:max(i1, i2)]
+        fromStop = stop_ids.index(from_stop_id)
+        toStop = stop_ids.index(to_stop_id)
+        between = stop_ids[min(fromStop, toStop)+1:max(fromStop, toStop)]
         return {
-            "count": abs(i2 - i1),
-            "from_index": i1,
-            "to_index": i2,
+            "count": abs(toStop - fromStop),
+            "from_index": fromStop,
+            "to_index": toStop,
             "stop_ids_between": between,
             "all_stop_ids": stop_ids
         }

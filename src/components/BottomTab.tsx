@@ -1,9 +1,10 @@
 import { View, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "components/Navigation/MainNavigator";
 
 const BottomTab = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   return (
     <View style={styles.container}>
       <View style={styles.icon}>
@@ -15,7 +16,7 @@ const BottomTab = () => {
           size={24}
           color="black"
           onPress={() => {
-            navigation.navigate("AddBusRoute" as never);
+            navigation.navigate("AddBusRoute");
           }}
         />
       </View>
