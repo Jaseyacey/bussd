@@ -2,7 +2,6 @@ import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_URL } from "src/lib/constants/config";
 
 const AddBusRoute = ({ navigation }: { navigation: any }) => {
   const [routeId, setRouteId] = useState("");
@@ -17,7 +16,7 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
   const fetchStops = useCallback(async () => {
     if (!routeId)
       return Alert.alert("Input Required", "Please enter a route number");
-
+    const API_URL = process.env.EXPO_PUBLIC_URL;
     try {
       const response = await fetch(
         `${API_URL}/api/tfl/stops?route_id=${routeId}&direction=outbound`
@@ -53,7 +52,7 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
 
     try {
       const userUuid = await AsyncStorage.getItem("user_uuid");
-
+      const API_URL = process.env.EXPO_PUBLIC_URL;
       const numberOfStopsBetween = await fetch(
         `${API_URL}/api/tfl/stops-between?route_id=${routeId}&from_stop_id=${stop1}&to_stop_id=${stop2}`
       );
@@ -79,7 +78,7 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
         return Alert.alert("Error", addData.error || "Failed to add route");
       }
 
-      navigation.navigate("Dashboard" as never);
+      navigation.navigate("Dashboard");
     } catch (err) {
       console.error(err);
       Alert.alert("Error", "Something went wrong while adding the route");
