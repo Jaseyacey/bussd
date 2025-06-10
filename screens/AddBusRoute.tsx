@@ -94,7 +94,7 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
   }, [routeId, stop1, stop2, navigation]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { flex: 1 }]}>
       <View style={styles.container}>
         <Text style={styles.title}>Add Bus Route</Text>
         <Text style={styles.subtitle}>Select your start and end stops</Text>
