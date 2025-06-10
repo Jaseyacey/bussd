@@ -1,107 +1,185 @@
-import React, { act } from "react";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react-native";
+import React from "react";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import SignInScreen from "../../screens/SignInScreen";
 import { NavigationContainer } from "@react-navigation/native";
+import axios from "axios";
+
+jest.mock("axios");
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const mockNavigate = jest.fn();
+jest.mock("@react-navigation/native", () => {
+  const actualNav = jest.requireActual("@react-navigation/native");
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
+  };
+});
 
 describe("SignInScreen", () => {
-  it("should render correctly", () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
-  it("should show the email input", () => {
+
+  it("renders all UI elements correctly", () => {
     render(
       <NavigationContainer>
         <SignInScreen />
       </NavigationContainer>
     );
+
+    expect(screen.getByText("Welcome Back")).toBeTruthy();
+    expect(screen.getByText("Sign in to continue")).toBeTruthy();
     expect(screen.getByPlaceholderText("Email")).toBeTruthy();
-  });
-  it("should show the password input", () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
     expect(screen.getByPlaceholderText("Password")).toBeTruthy();
-  });
-  it("should show the sign in button", () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
     expect(screen.getByTestId("Sign In")).toBeTruthy();
+    expect(screen.getByText("Sign up")).toBeTruthy();
+    expect(screen.getByText("Forgot Password?")).toBeTruthy();
   });
-  it("should sign in", () => {
+
+  it("handles email input correctly", () => {
     render(
       <NavigationContainer>
         <SignInScreen />
       </NavigationContainer>
     );
-    fireEvent.changeText(screen.getByPlaceholderText("Email"), "test@test.com");
-    fireEvent.changeText(screen.getByPlaceholderText("Password"), "password");
+
+    const emailInput = screen.getByPlaceholderText("Email");
+    fireEvent.changeText(emailInput, "test@example.com");
+    expect(emailInput.props.value).toBe("test@example.com");
+  });
+
+  it("handles password input correctly", () => {
+    render(
+      <NavigationContainer>
+        <SignInScreen />
+      </NavigationContainer>
+    );
+
+    const passwordInput = screen.getByPlaceholderText("Password");
+    fireEvent.changeText(passwordInput, "password123");
+    expect(passwordInput.props.value).toBe("password123");
+  });
+
+  it("shows loading state during sign in", async () => {
+    mockedAxios.post.mockImplementationOnce(
+      () => new Promise((resolve) => setTimeout(resolve, 100))
+    );
+
+    render(
+      <NavigationContainer>
+        <SignInScreen />
+      </NavigationContainer>
+    );
+
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Email"),
+      "test@example.com"
+    );
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Password"),
+      "password123"
+    );
     fireEvent.press(screen.getByTestId("Sign In"));
-    expect(screen.getByTestId("Sign In")).toBeTruthy();
-  });
-  it("should show an error message if the email is invalid", () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
-    fireEvent.changeText(screen.getByPlaceholderText("Email"), "invalid");
-  });
-  it("should show an error message if the password is invalid", () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
-    fireEvent.changeText(screen.getByPlaceholderText("Password"), "invalid");
-  });
-  it("should show an error message if the email and password are invalid", async () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
-    fireEvent.changeText(screen.getByPlaceholderText("Email"), "invalid");
-    fireEvent.changeText(screen.getByPlaceholderText("Password"), "invalid");
-    fireEvent.press(screen.getByTestId("Sign In"));
-    setTimeout(() => {
-      expect(screen.getByText("Invalid email or password")).toBeTruthy();
-    }, 500);
-  });
-  it("should show a loading indicator when signing in", () => {
-    render(
-      <NavigationContainer>
-        <SignInScreen />
-      </NavigationContainer>
-    );
-    fireEvent.changeText(screen.getByPlaceholderText("Email"), "test@test.com");
-    fireEvent.changeText(screen.getByPlaceholderText("Password"), "password");
-    fireEvent.press(screen.getByTestId("Sign In"));
+
     expect(screen.getByTestId("Loading...")).toBeTruthy();
   });
-  it("should navigate to the dashboard", () => {
+
+  it("navigates to Dashboard on successful sign in", async () => {
+    const mockResponse = {
+      data: {
+        user: {
+          id: "test-uuid",
+        },
+      },
+    };
+
+    mockedAxios.post.mockResolvedValueOnce(mockResponse);
+
     render(
       <NavigationContainer>
         <SignInScreen />
       </NavigationContainer>
     );
-    fireEvent.changeText(screen.getByPlaceholderText("Email"), "test@test.com");
-    fireEvent.changeText(screen.getByPlaceholderText("Password"), "password");
+
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Email"),
+      "test@example.com"
+    );
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Password"),
+      "password123"
+    );
     fireEvent.press(screen.getByTestId("Sign In"));
-    setTimeout(() => {
-      expect(screen.getByTestId("Dashboard")).toBeTruthy();
-    }, 500);
+
+    await screen.findByTestId("Loading...");
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect.stringContaining("/supabase/auth/signin"),
+      {
+        email: "test@example.com",
+        password: "password123",
+      }
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith("Dashboard", {
+      email: "test@example.com",
+      user_uuid: "test-uuid",
+    });
+  });
+
+  it("handles sign in error correctly", async () => {
+    const mockError = new Error("Sign in failed");
+    mockedAxios.post.mockRejectedValueOnce(mockError);
+    const consoleSpy = jest.spyOn(console, "log");
+
+    render(
+      <NavigationContainer>
+        <SignInScreen />
+      </NavigationContainer>
+    );
+
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Email"),
+      "test@example.com"
+    );
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Password"),
+      "wrong-password"
+    );
+    fireEvent.press(screen.getByTestId("Sign In"));
+
+    await screen.findByTestId("Loading...");
+
+    expect(consoleSpy).toHaveBeenCalledWith(mockError);
+    consoleSpy.mockRestore();
+  });
+
+  it("navigates to Auth screen when Sign up is pressed", () => {
+    render(
+      <NavigationContainer>
+        <SignInScreen />
+      </NavigationContainer>
+    );
+
+    fireEvent.press(screen.getByText("Sign up"));
+    expect(mockNavigate).toHaveBeenCalledWith("Auth");
+  });
+
+  it("calls forgot password function when Forgot Password is pressed", () => {
+    const consoleSpy = jest.spyOn(console, "log");
+
+    render(
+      <NavigationContainer>
+        <SignInScreen />
+      </NavigationContainer>
+    );
+
+    fireEvent.press(screen.getByText("Forgot Password?"));
+    expect(consoleSpy).toHaveBeenCalledWith("Forgot Password");
+
+    consoleSpy.mockRestore();
   });
 });
