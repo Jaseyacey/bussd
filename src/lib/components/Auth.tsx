@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, View, TouchableOpacity } from "react-native";
-import { Button, Input, Text } from "@rneui/themed";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+} from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../components/Navigation/MainNavigator";
 import {
@@ -129,75 +136,141 @@ export default function Auth() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input
-          label="Email"
-          leftIcon={{ type: "font-awesome", name: "envelope", size: 24 }}
+      {loading && (
+        <Text style={styles.loadingText} testID="Loading...">
+          Loading...
+        </Text>
+      )}
+      <Text style={styles.title}>Create Account</Text>
+      <Text style={styles.subtitle}>Sign up to get started</Text>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={[styles.input, errors.email && styles.inputError]}
+          placeholder="Email"
+          placeholderTextColor="#666"
           onChangeText={(text) => setForm({ ...form, email: text })}
           value={form.email}
-          errorMessage={errors.email}
-          placeholder="email@address.com"
-          autoCapitalize={"none"}
-          disabled={loading}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Password"
-          leftIcon={{ type: "font-awesome", name: "lock", size: 24 }}
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
+        <TextInput
+          style={[styles.input, errors.password && styles.inputError]}
+          placeholder="Password"
+          placeholderTextColor="#666"
           onChangeText={(text) => setForm({ ...form, password: text })}
           value={form.password}
-          errorMessage={errors.password}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize={"none"}
-          disabled={loading}
+          secureTextEntry
+          autoCapitalize="none"
         />
-        <Input
-          label="Confirm Password"
-          leftIcon={{ type: "font-awesome", name: "lock", size: 24 }}
+        {errors.password && (
+          <Text style={styles.errorText}>{errors.password}</Text>
+        )}
+
+        <TextInput
+          style={[styles.input, errors.confirmPassword && styles.inputError]}
+          placeholder="Confirm Password"
+          placeholderTextColor="#666"
           onChangeText={(text) => setForm({ ...form, confirmPassword: text })}
           value={form.confirmPassword}
-          errorMessage={errors.confirmPassword}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize={"none"}
-          disabled={loading}
+          secureTextEntry
+          autoCapitalize="none"
         />
+        {errors.confirmPassword && (
+          <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+        )}
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title="Already have an account? Sign in here."
-          type="clear"
-          onPress={() => navigation.navigate("SignInScreen")}
-          containerStyle={{ marginVertical: 10 }}
-          titleStyle={{ color: "#007bff", textDecorationLine: "underline" }}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Button
-          title="Sign up"
-          disabled={loading}
-          onPress={() => {
-            signUpWithEmail();
-          }}
-        />
-      </View>
+
+      <Text
+        style={styles.signIn}
+        onPress={() => navigation.navigate("SignInScreen")}
+      >
+        Already have an account? Sign in
+      </Text>
+
+      <TouchableOpacity
+        style={styles.signUpButton}
+        onPress={signUpWithEmail}
+        disabled={loading}
+      >
+        <Text style={styles.signUpButtonText}>Sign Up</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
+const { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: "stretch",
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
   },
-  mt20: {
-    marginTop: 20,
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 32,
+  },
+  inputContainer: {
+    width: "100%",
+    maxWidth: 400,
+    marginBottom: 24,
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    fontSize: 16,
+  },
+  inputError: {
+    borderWidth: 1,
+    borderColor: "red",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: -12,
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  signIn: {
+    color: "#007AFF",
+    fontSize: 16,
+    width: "100%",
+    fontWeight: "600",
+    marginBottom: 10,
+    textAlign: "left",
+  },
+  signUpButton: {
+    width: "100%",
+    maxWidth: 400,
+    height: 50,
+    backgroundColor: "#007AFF",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  signUpButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loadingText: {
+    marginBottom: 20,
+    color: "#666",
   },
 });
