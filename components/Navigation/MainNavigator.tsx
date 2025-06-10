@@ -14,6 +14,7 @@ export type RootStackParamList = {
   };
   SignInScreen: undefined;
   AddBusRoute: undefined;
+  SignUpScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
