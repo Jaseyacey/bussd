@@ -1,5 +1,13 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  SafeAreaView,
+} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -86,71 +94,140 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
   }, [routeId, stop1, stop2, navigation]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add Bus Route From Stop To Stop</Text>
+    <SafeAreaView style={[styles.safeArea, { flex: 1 }]}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Add Bus Route</Text>
+        <Text style={styles.subtitle}>Select your start and end stops</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter single bus route number (e.g. 87)"
-        value={routeId}
-        onChangeText={(text) => setRouteId(text.trim())}
-      />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter single bus route number (e.g. 87)"
+            value={routeId}
+            onChangeText={(text) => setRouteId(text.trim())}
+            keyboardType="numeric"
+            placeholderTextColor="#666"
+          />
 
-      <Button title="Fetch Stops" onPress={fetchStops} />
+          <TouchableOpacity style={styles.button} onPress={fetchStops}>
+            <Text style={styles.buttonText}>Fetch Stops</Text>
+          </TouchableOpacity>
 
-      <DropDownPicker
-        open={openFirstStop}
-        value={stop1}
-        items={stops}
-        setOpen={setOpenFirstStop}
-        setValue={setStop1}
-        setItems={setStops}
-        placeholder="Select Start Stop"
-        listMode="SCROLLVIEW"
-        maxHeight={300}
-        style={styles.dropdown}
-        zIndex={3000}
-        zIndexInverse={1000}
-      />
+          <DropDownPicker
+            open={openFirstStop}
+            value={stop1}
+            items={stops}
+            setOpen={setOpenFirstStop}
+            setValue={setStop1}
+            setItems={setStops}
+            placeholder="Select Start Stop"
+            listMode="SCROLLVIEW"
+            maxHeight={300}
+            style={styles.dropdown}
+            textStyle={styles.dropdownText}
+            dropDownContainerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            zIndex={3000}
+            zIndexInverse={1000}
+          />
 
-      <DropDownPicker
-        open={openSecondStop}
-        value={stop2}
-        items={stops}
-        setOpen={setOpenSecondStop}
-        setValue={setStop2}
-        setItems={setStops}
-        placeholder="Select End Stop"
-        listMode="SCROLLVIEW"
-        maxHeight={300}
-        style={styles.dropdown}
-        zIndex={2000}
-        zIndexInverse={2000}
-      />
+          <DropDownPicker
+            open={openSecondStop}
+            value={stop2}
+            items={stops}
+            setOpen={setOpenSecondStop}
+            setValue={setStop2}
+            setItems={setStops}
+            placeholder="Select End Stop"
+            listMode="SCROLLVIEW"
+            maxHeight={300}
+            style={styles.dropdown}
+            textStyle={styles.dropdownText}
+            dropDownContainerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            zIndex={2000}
+            zIndexInverse={2000}
+          />
+        </View>
 
-      <Button title="Add Route" onPress={handleAddRoute} />
-    </View>
+        <TouchableOpacity style={styles.submitButton} onPress={handleAddRoute}>
+          <Text style={styles.buttonText}>Add Route</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flex: 1,
     padding: 20,
-    gap: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "bold",
+    color: "#1a1a1a",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 24,
+  },
+  inputContainer: {
+    gap: 16,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    borderRadius: 4,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: "#1a1a1a",
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  submitButton: {
+    backgroundColor: "#007AFF",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    marginTop: "auto",
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
   dropdown: {
-    marginTop: 10,
+    backgroundColor: "#f5f5f5",
+    borderWidth: 0,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  dropdownContainer: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 12,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: "#1a1a1a",
+  },
+  dropdownPlaceholder: {
+    color: "#666",
+    fontSize: 16,
   },
 });
 
