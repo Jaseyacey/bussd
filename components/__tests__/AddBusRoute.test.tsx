@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, act } from "@testing-library/react-native";
+import { render, fireEvent, act, waitFor } from "@testing-library/react-native";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AddBusRoute from "../../screens/AddBusRoute";
@@ -7,7 +7,7 @@ import AddBusRoute from "../../screens/AddBusRoute";
 // Mock DropDownPicker
 jest.mock("react-native-dropdown-picker", () => {
   return function MockDropDownPicker(props: any) {
-    return null;
+    return null; // The actual UI isn't important for these tests
   };
 });
 
