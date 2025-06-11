@@ -109,7 +109,7 @@ const DashboardScreen = () => {
                   routeId: item.id,
                   bus_route: item.bus_route,
                   percentage_travelled: item.percentage_travelled,
-                  userUuid,
+                  userUuid: userUuid || "",
                 })
               }
             />
