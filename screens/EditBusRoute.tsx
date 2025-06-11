@@ -1,24 +1,41 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   SafeAreaView,
+  StatusBar,
+  Alert,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../components/Navigation/MainNavigator";
+import { API_URL } from "../src/lib/constants/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DropDownPicker from "react-native-dropdown-picker";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-const AddBusRoute = ({ navigation }: { navigation: any }) => {
-  const [routeId, setRouteId] = useState("");
+type EditBusRouteRouteProp = RouteProp<RootStackParamList, "EditBusRoute">;
+type EditBusRouteNavigationProp = StackNavigationProp<RootStackParamList>;
+
+const EditBusRoute = () => {
+  const navigation = useNavigation<EditBusRouteNavigationProp>();
+  const route = useRoute<EditBusRouteRouteProp>();
+  const { routeId, bus_route, percentage_travelled, userUuid } = route.params;
+
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [routeNumber, setRouteNumber] = useState(bus_route);
+  const [percentage, setPercentage] = useState<number>(
+    percentage_travelled || 0
+  );
+  const [routeData, setRouteData] = useState<any>(null);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
+  // Dropdown states
   const [stops, setStops] = useState<{ label: string; value: string }[]>([]);
   const [stop1, setStop1] = useState<string | null>(null);
   const [stop2, setStop2] = useState<string | null>(null);
-
   const [openFirstStop, setOpenFirstStop] = useState(false);
   const [openSecondStop, setOpenSecondStop] = useState(false);
 
@@ -35,12 +52,12 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
   }, []);
 
   const fetchStops = useCallback(async () => {
-    if (!routeId)
+    if (!routeNumber) {
       return Alert.alert("Input Required", "Please enter a route number");
-    const API_URL = process.env.EXPO_PUBLIC_URL;
+    }
     try {
       const response = await fetch(
-        `${API_URL}/api/tfl/stops?route_id=${routeId}&direction=outbound`
+        `${API_URL}/api/tfl/stops?route_id=${routeNumber}&direction=outbound`
       );
       const data = await response.json();
 
@@ -58,24 +75,35 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
       }
 
       setStops(stopItems);
-      setStop1(stopItems[0].value);
-      setStop2(stopItems[stopItems.length - 1].value);
+
+      // Only set default stops if they haven't been set yet
+      if (!stop1 || !stop2) {
+        if (routeData?.data?.[0]) {
+          const currentStartStop = routeData.data[0].started_stop;
+          const currentEndStop = routeData.data[0].ended_stop;
+          setStop1(currentStartStop);
+          setStop2(currentEndStop);
+        } else {
+          setStop1(stopItems[0].value);
+          setStop2(stopItems[stopItems.length - 1].value);
+        }
+      }
     } catch (err) {
       console.error(err);
       Alert.alert("Error", "Something went wrong while fetching stops");
     }
-  }, [routeId]);
+  }, [routeNumber, stop1, stop2]);
 
-  const handleAddRoute = useCallback(async () => {
-    if (!routeId || !stop1 || !stop2) {
+  const handleUpdateRoute = useCallback(async () => {
+    console.log("😊😊😊😊😊😊😊😊😊😊😊", routeNumber, stop1, stop2);
+    if (!routeNumber || !stop1 || !stop2) {
       return Alert.alert("Missing Info", "Please complete all fields");
     }
 
     try {
-      const userUuid = await AsyncStorage.getItem("user_uuid");
-      const API_URL = process.env.EXPO_PUBLIC_URL;
+      // First get the number of stops between
       const numberOfStopsBetween = await fetch(
-        `${API_URL}/api/tfl/stops-between?route_id=${routeId}&from_stop_id=${stop1}&to_stop_id=${stop2}`
+        `${API_URL}/api/tfl/stops-between?route_id=${routeNumber}&from_stop_id=${stop1}&to_stop_id=${stop2}`
       );
       const numberOfStopsBetweenData = await numberOfStopsBetween.json();
 
@@ -87,40 +115,106 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
       }
 
       const { all_stop_ids = [], count = 0 } = numberOfStopsBetweenData;
-      const percentage = Math.round((count / all_stop_ids.length) * 100);
+      const newPercentage = Math.round((count / all_stop_ids.length) * 100);
 
-      const addRes = await fetch(
-        `${API_URL}/api/tfl/add-bus-route?bus_route=${routeId}&percentage=${percentage}&user_uuid=${userUuid}&started_stop=${stop1}&ended_stop=${stop2}&user_email=${userEmail}`,
-        { method: "POST", headers: { "Content-Type": "application/json" } }
+      const payload = {
+        user_email: userEmail,
+        bus_route: routeNumber,
+        percentage_travelled: String(newPercentage),
+        started_stop: stop1,
+        ended_stop: stop2,
+        user_uuid: userUuid,
+      };
+
+      console.log("Sending update payload:", payload);
+
+      // Update the route
+      const updateRes = await fetch(
+        `${API_URL}/api/tfl/update-bus-route/${routeId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
       );
 
-      const addData = await addRes.json();
-      if (!addRes.ok || addData.error) {
-        return Alert.alert("Error", addData.error || "Failed to add route");
+      const updateData = await updateRes.json();
+      if (!updateRes.ok || updateData.error) {
+        console.error("Update failed:", updateData);
+        return Alert.alert(
+          "Error",
+          updateData.error || "Failed to update route"
+        );
       }
 
-      navigation.navigate("Dashboard", {
-        email: userEmail || "",
-        user_uuid: userUuid || "",
-      });
+      if (!updateData.data || updateData.data.length === 0) {
+        console.error("No data in update response");
+        return Alert.alert("Error", "No route was updated. Please try again.");
+      }
+
+      Alert.alert("Success", "Route updated successfully", [
+        {
+          text: "OK",
+          onPress: () =>
+            navigation.navigate("Dashboard", {
+              email: userEmail || "",
+              user_uuid: userUuid || "",
+            }),
+        },
+      ]);
     } catch (err) {
-      console.error(err);
-      Alert.alert("Error", "Something went wrong while adding the route");
+      console.error("Update error:", err);
+      Alert.alert("Error", "Something went wrong while updating the route");
     }
-  }, [routeId, stop1, stop2, navigation, userEmail]);
+  }, [routeNumber, stop1, stop2, routeId, userEmail, userUuid, navigation]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (!userEmail || initialDataLoaded) return;
+
+    const fetchRouteData = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/api/tfl/update-bus-route/${routeId}?user_email=${userEmail}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+        setRouteData(data);
+        setInitialDataLoaded(true);
+      } catch (error) {
+        console.error("Error fetching route:", error);
+      }
+    };
+
+    fetchRouteData();
+  }, [routeId, userEmail, initialDataLoaded]);
+
+  // Fetch stops after initial data is loaded
+  useEffect(() => {
+    if (initialDataLoaded && routeData) {
+      fetchStops();
+    }
+  }, [initialDataLoaded, fetchStops]);
 
   return (
-    <SafeAreaView style={[styles.safeArea, { flex: 1 }]}>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Add Bus Route</Text>
-        <Text style={styles.subtitle}>Select your start and end stops</Text>
+        <Text style={styles.title}>Edit Bus Route</Text>
+        <Text style={styles.subtitle}>Update your start and end stops</Text>
 
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder="Enter single bus route number (e.g. 87)"
-            value={routeId}
-            onChangeText={(text) => setRouteId(text.trim())}
+            value={routeNumber}
+            onChangeText={(text) => setRouteNumber(text.trim())}
             keyboardType="numeric"
             placeholderTextColor="#666"
           />
@@ -166,8 +260,11 @@ const AddBusRoute = ({ navigation }: { navigation: any }) => {
           />
         </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleAddRoute}>
-          <Text style={styles.buttonText}>Add Route</Text>
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleUpdateRoute}
+        >
+          <Text style={styles.buttonText}>Update Route</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -247,4 +344,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddBusRoute;
+export default EditBusRoute;

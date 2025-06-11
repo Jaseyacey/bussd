@@ -3,6 +3,7 @@ import SplashScreen from "../../screens/Splashscreen";
 import DashboardScreen from "../../screens/DashboardScreen";
 import SignInScreen from "../../screens/SignInScreen.tsx";
 import AddBusRoute from "../../screens/AddBusRoute";
+import EditBusRoute from "../../screens/EditBusRoute";
 import Auth from "../../src/lib/components/Auth";
 
 export type RootStackParamList = {
@@ -15,6 +16,12 @@ export type RootStackParamList = {
   SignInScreen: undefined;
   AddBusRoute: undefined;
   SignUpScreen: undefined;
+  EditBusRoute: {
+    bus_route: string;
+    percentage_travelled: number;
+    routeId: number;
+    userUuid: string;
+  };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -32,6 +39,7 @@ const MainNavigator = () => {
       <Stack.Screen name="Dashboard" component={DashboardScreen} />
       <Stack.Screen name="SignInScreen" component={SignInScreen} />
       <Stack.Screen name="AddBusRoute" component={AddBusRoute} />
+      <Stack.Screen name="EditBusRoute" component={EditBusRoute} />
     </Stack.Navigator>
   );
 };
