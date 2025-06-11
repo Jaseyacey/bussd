@@ -23,7 +23,7 @@ const BottomTab = () => {
       </Pressable>
       <Pressable
         style={styles.tabButton}
-        onPress={() => navigation.navigate("SignInScreen")}
+        onPress={() => navigation.navigate("UserProfile")}
       >
         <Icon name="user" size={24} color="#000000" />
       </Pressable>
