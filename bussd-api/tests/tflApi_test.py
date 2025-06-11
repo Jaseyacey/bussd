@@ -108,3 +108,42 @@ async def test_add_bus_route_success(mocker):
 
     assert response.status_code == 200
     assert response.json()["message"] == "Bus route added"
+
+
+@pytest.mark.asyncio
+async def test_update_bus_route_success(mocker):
+    # Mock supabase and env check
+    mock_supabase = mocker.Mock()
+    mocker.patch("main.require_supabase", return_value=None)
+    mock_response = mocker.Mock()
+    mock_response.data = {"id": 1}
+    mock_supabase.table.return_value.update.return_value.execute.return_value = mock_response
+    mocker.patch("main.supabase", mock_supabase)
+
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.post("/update-bus-route/1", params={
+            "bus_route": "88",
+            "percentage": 80,
+            "user_uuid": "user-abc"
+        })
+
+    assert response.status_code == 200
+    assert response.json()["message"] == "Bus route updated"
+
+@pytest.mark.asyncio
+async def test_update_bus_route_not_found(mocker):
+    # Mock supabase and env check
+    mock_supabase = mocker.Mock()
+    mocker.patch("main.require_supabase", return_value=None)
+    mock_supabase.table.return_value.update.return_value.execute.return_value = None
+    mocker.patch("main.supabase", mock_supabase)
+
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.post("/update-bus-route/1", params={
+            "bus_route": "88",
+            "percentage": 80,
+            "user_uuid": "user-abc"
+        })
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "No route found with id 1 for this user"

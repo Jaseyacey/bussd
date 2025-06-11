@@ -7,12 +7,16 @@ import {
   SafeAreaView,
   FlatList,
   StatusBar,
+  Alert,
+  Animated,
 } from "react-native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import BottomTab from "../src/components/BottomTab";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../src/lib/constants/config";
+import { Swipeable } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface RouteData {
   bus_route: string;
@@ -58,16 +62,89 @@ const DashboardScreen = () => {
       });
   }, [userUuid]);
 
-  const renderItem = ({ item }: { item: RouteData }) => (
-    <View testID="listItem" style={styles.listItem}>
-      <View style={styles.routeInfo}>
-        <View style={styles.routeNumberBox}>
-          <Text style={styles.routeNumber}>{item.bus_route}</Text>
+  const renderItem = ({ item }: { item: RouteData }) => {
+    const handleDelete = () => {
+      Alert.alert(
+        "Delete Route",
+        "Are you sure you want to delete this route?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => {
+              // TODO: Implement delete functionality
+              console.log("Delete route:", item.id);
+            },
+          },
+        ]
+      );
+    };
+
+    const renderRightActions = (
+      progress: Animated.AnimatedInterpolation<number>,
+      dragX: Animated.AnimatedInterpolation<number>
+    ) => {
+      const scale = dragX.interpolate({
+        inputRange: [-80, 0],
+        outputRange: [1, 0],
+        extrapolate: "clamp",
+      });
+
+      return (
+        <View style={styles.rightActions}>
+          <Animated.View
+            style={[
+              styles.actionButton,
+              styles.editButton,
+              { transform: [{ scale }] },
+            ]}
+          >
+            <Icon
+              name="pencil"
+              size={24}
+              color="#fff"
+              onPress={() =>
+                navigation.navigate("EditBusRoute", {
+                  routeId: item.id,
+                  bus_route: item.bus_route,
+                  percentage_travelled: item.percentage_travelled,
+                  userUuid,
+                })
+              }
+            />
+          </Animated.View>
+          <Animated.View
+            style={[
+              styles.actionButton,
+              styles.deleteButton,
+              { transform: [{ scale }] },
+            ]}
+          >
+            <Icon
+              name="trash-can"
+              size={24}
+              color="#fff"
+              onPress={handleDelete}
+            />
+          </Animated.View>
         </View>
-      </View>
-      <Text style={styles.percentage}>{item.percentage_travelled}%</Text>
-    </View>
-  );
+      );
+    };
+
+    return (
+      <Swipeable renderRightActions={renderRightActions} rightThreshold={40}>
+        <View testID="listItem" style={styles.listItem}>
+          <View style={styles.routeInfo}>
+            <View style={styles.routeNumberBox}>
+              <Text style={styles.routeNumber}>{item.bus_route}</Text>
+            </View>
+          </View>
+          <Text style={styles.percentage}>{item.percentage_travelled}%</Text>
+        </View>
+      </Swipeable>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -138,6 +215,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0, 0, 0, 0.1)",
   },
@@ -160,15 +239,29 @@ const styles = StyleSheet.create({
     color: "#000000",
     fontWeight: "600",
   },
-  destination: {
-    fontSize: 16,
-    color: "#000000",
-    fontWeight: "400",
-  },
   percentage: {
     fontSize: 20,
     color: "#000000",
     fontWeight: "600",
+    marginLeft: 8,
+  },
+  rightActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: 120,
+  },
+  actionButton: {
+    width: 60,
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  editButton: {
+    backgroundColor: "#007AFF",
+  },
+  deleteButton: {
+    backgroundColor: "red",
   },
   noRoutesContainer: {
     flex: 1,

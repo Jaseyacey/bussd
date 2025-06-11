@@ -25,6 +25,7 @@ const SplashScreen = () => {
 
         const data = await response.json();
         await AsyncStorage.setItem("user_uuid", data.session.user.id);
+        await AsyncStorage.setItem("userEmail", data.session.user.email);
         data.isLoggedIn =
           true && data.session?.user?.email
             ? navigation.navigate("Dashboard", {

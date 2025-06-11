@@ -16,7 +16,13 @@ jest.mock("@react-navigation/native", () => {
     useRoute: jest.fn(),
   };
 });
-
+jest.mock("react-native-gesture-handler", () => {
+  const View = require("react-native").View;
+  return {
+    Swipeable: View,
+    GestureHandlerRootView: View,
+  };
+});
 global.fetch = jest.fn();
 
 describe("DashboardScreen", () => {
