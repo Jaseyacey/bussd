@@ -95,7 +95,7 @@ const EditBusRoute = () => {
   }, [routeNumber, stop1, stop2]);
 
   const handleUpdateRoute = useCallback(async () => {
-    console.log("😊😊😊😊😊😊😊😊😊😊😊", routeNumber, stop1, stop2);
+    console.log("Updating route with details:", { routeNumber, stop1, stop2 });
     if (!routeNumber || !stop1 || !stop2) {
       return Alert.alert("Missing Info", "Please complete all fields");
     }
