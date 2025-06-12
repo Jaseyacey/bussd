@@ -73,8 +73,33 @@ const DashboardScreen = () => {
             text: "Delete",
             style: "destructive",
             onPress: () => {
-              // TODO: Implement delete functionality
-              console.log("Delete route:", item.id);
+              fetch(`${API_URL}/api/tfl/delete-bus-route/${item.id}`, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.message === "Bus route deleted") {
+                    setRoutes(routes.filter((route) => route.id !== item.id));
+                    Alert.alert("Route deleted", "Route deleted successfully");
+                    fetch(
+                      `${API_URL}/api/dashboard/routes/?user_uuid=${userUuid}`,
+                      {
+                        method: "GET",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      }
+                    );
+                  } else {
+                    console.error("Error deleting route:", data);
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error deleting route:", error);
+                });
             },
           },
         ]
@@ -122,6 +147,7 @@ const DashboardScreen = () => {
             ]}
           >
             <Icon
+              testID={`deleteButton-${item.bus_route}`}
               name="trash-can"
               size={24}
               color="#fff"
@@ -159,6 +185,7 @@ const DashboardScreen = () => {
           data={routes}
           keyExtractor={(item) => item.id.toString()}
           style={styles.list}
+          testID="listItem"
           ListEmptyComponent={() => (
             <View testID="noRoutesContainer" style={styles.noRoutesContainer}>
               <Text testID="noRoutesText" style={styles.noRoutesText}>

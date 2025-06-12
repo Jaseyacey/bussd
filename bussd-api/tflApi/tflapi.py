@@ -197,3 +197,14 @@ async def update_bus_route(route_id: int, payload: UpdateBusRoutePayload):
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(status_code=500, detail=f"Failed to update Supabase: {e}")
+    
+@app.delete('/delete-bus-route/{bus_route_id}')
+async def delete_bus_route(bus_route_id: int):
+    require_supabase()
+
+    try:
+        response = supabase.table("bus_routes_taken").delete().eq("id", bus_route_id).execute()
+        return {"message": "Bus route deleted", "data": response.data}
+    except Exception as e:
+        logging.error(f"Error deleting route: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete route: {e}")
