@@ -3,12 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { trackEvent } from "../src/lib/utils/amplitude";
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
+    trackEvent("splash_screen_loaded");
     const checkLoginStatus = async () => {
       try {
         const API_URL = process.env.EXPO_PUBLIC_URL;
