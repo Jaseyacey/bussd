@@ -6,6 +6,7 @@ import AddBusRoute from "../../screens/AddBusRoute";
 import EditBusRoute from "../../screens/EditBusRoute";
 import Auth from "../../src/lib/components/Auth";
 import UserProfileScreen from "../../screens/UserProfileScreen.tsx";
+import PercentageOfAllBusRoutes from "../../screens/PercentageOfAllBusRoutes";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -31,6 +32,7 @@ export type RootStackParamList = {
   AboutUs: undefined;
   Feedback: undefined;
   Help: undefined;
+  PercentageOfAllBusRoutes: undefined;
   Share: undefined;
 };
 
@@ -51,6 +53,10 @@ const MainNavigator = () => {
       <Stack.Screen name="AddBusRoute" component={AddBusRoute} />
       <Stack.Screen name="EditBusRoute" component={EditBusRoute} />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen
+        name="PercentageOfAllBusRoutes"
+        component={PercentageOfAllBusRoutes}
+      />
     </Stack.Navigator>
   );
 };
