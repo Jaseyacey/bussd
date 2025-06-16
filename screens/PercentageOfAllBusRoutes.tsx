@@ -30,6 +30,7 @@ const PercentageOfAllBusRoutes = () => {
         setPercentage(calculatedPercentage);
       } catch (error) {
         console.error("Error calculating route percentage:", error);
+        setError(true);
       } finally {
         setLoading(false);
       }
