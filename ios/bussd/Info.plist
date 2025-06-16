@@ -49,11 +49,9 @@
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>We need access to your location to show you bus stops near you</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>We need access to your location to show you bus stops near you and provide real-time
-      updates</string>
+    <string>We need access to your location to show you bus stops near you and provide real-time updates</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>We need access to your location to show you bus stops near you and provide real-time
-      updates</string>
+    <string>We need access to your location to show you bus stops near you and provide real-time updates</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>We need access to your photo library to save your bus route</string>
     <key>NSUserTrackingUsageDescription</key>
