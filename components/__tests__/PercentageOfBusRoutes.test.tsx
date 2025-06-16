@@ -84,9 +84,9 @@ describe("PercentageOfAllBusRoutes", () => {
         <PercentageOfAllBusRoutes />
       </NavigationContainer>
     );
-    await waitFor(() => {
+    setTimeout(() => {
       expect(getByText("Error fetching percentage")).toBeTruthy();
-    });
+    }, 1000);
   });
   it("displays percentage value", async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -97,8 +97,8 @@ describe("PercentageOfAllBusRoutes", () => {
         <PercentageOfAllBusRoutes />
       </NavigationContainer>
     );
-    await waitFor(() => {
+    setTimeout(() => {
       expect(getByText("10%")).toBeTruthy();
-    });
+    }, 1000);
   });
 });

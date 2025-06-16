@@ -8,6 +8,7 @@ const PercentageOfAllBusRoutes = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const API_URL = process.env.EXPO_PUBLIC_URL;
     const fetchData = async () => {
       try {
         const uuid = await AsyncStorage.getItem("user_uuid");
@@ -30,7 +31,6 @@ const PercentageOfAllBusRoutes = () => {
         setPercentage(calculatedPercentage);
       } catch (error) {
         console.error("Error calculating route percentage:", error);
-        setError(true);
       } finally {
         setLoading(false);
       }
