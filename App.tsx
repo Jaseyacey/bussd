@@ -8,10 +8,14 @@ import { initAmplitude } from "./src/lib/utils/amplitude";
 export default function App() {
   useEffect(() => {
     const apiKey = process.env.EXPO_PUBLIC_AMPLITUDE_API_KEY || "";
-    try {
-      initAmplitude(apiKey);
-    } catch (error) {
-      console.error("Error initializing Amplitude:", error);
+    if (apiKey) {
+      try {
+        initAmplitude(apiKey);
+      } catch (error) {
+        console.error("Error initializing Amplitude:", error);
+      }
+    } else {
+      console.warn("Amplitude API key is missing or invalid. Analytics will not be initialized.");
     }
   }, []);
   return (
