@@ -55,7 +55,7 @@
     <key>NSPhotoLibraryUsageDescription</key>
     <string>We need access to your photo library to save your bus route</string>
     <key>NSUserTrackingUsageDescription</key>
-    <string>We need access to your location to show you bus stops near you</string>
+    <string>We need permission to track your activity across apps and websites to provide personalized ads and improve our services</string>
     <key>NSAdvertisingAttributionReportEndpoint</key>
     <string>https://api-adservices.apple.com/v1/</string>
     <key>SKAdNetworkItems</key>
