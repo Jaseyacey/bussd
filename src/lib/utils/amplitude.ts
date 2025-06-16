@@ -1,4 +1,4 @@
-import { init, track, identify } from '@amplitude/analytics-react-native';
+import { init, track } from '@amplitude/analytics-react-native';
 
 export const initAmplitude = (apiKey: string) => {
   init(apiKey);
