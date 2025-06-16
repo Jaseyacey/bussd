@@ -4,6 +4,7 @@ import SplashScreen from "../../screens/Splashscreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../components/Navigation/MainNavigator";
+import { trackEvent } from "../../src/lib/utils/amplitude";
 
 jest.mock("@react-navigation/native", () => {
   return {
@@ -11,6 +12,14 @@ jest.mock("@react-navigation/native", () => {
     useNavigation: jest.fn(),
   };
 });
+
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+);
+
+jest.mock("../../src/lib/utils/amplitude", () => ({
+  trackEvent: jest.fn(),
+}));
 
 global.fetch = jest.fn();
 
@@ -155,5 +164,13 @@ describe("SplashScreen", () => {
     await waitFor(() => {
       expect(mockNavigation.navigate).toHaveBeenCalledWith("Auth");
     });
+  });
+  it("tracks splash screen loaded event", () => {
+    render(
+      <NavigationContainer>
+        <SplashScreen />
+      </NavigationContainer>
+    );
+    expect(trackEvent).toHaveBeenCalledWith("splash_screen_loaded");
   });
 });
