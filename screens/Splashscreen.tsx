@@ -1,16 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../components/Navigation/MainNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { trackEvent } from "../src/lib/utils/amplitude";
+import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
+
+import { RootStackParamList } from "../components/Navigation/MainNavigator";
+import {
+  initAmplitude,
+  setAmplitudeUserId,
+  trackEvent,
+} from "../src/lib/utils/amplitude";
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  const handleTrackingConsent = async (email: string) => {
+    try {
+      const apiKey = process.env.EXPO_PUBLIC_AMPLITUDE_API_KEY || "";
+
+      const { status } = await requestTrackingPermissionsAsync();
+      if (status === "granted") {
+        console.log("GRANTED: Tracking permission granted.");
+      } else {
+        console.log("Tracking not granted.");
+      }
+
+      console.log("Initializing Amplitude...");
+      await initAmplitude(apiKey);
+      setAmplitudeUserId(email);
+      console.log("Amplitude initialized and user ID set.");
+    } catch (err) {
+      console.error("Error during Amplitude setup:", err);
+      navigation.navigate("Auth");
+    }
+  };
 
   useEffect(() => {
     trackEvent("splash_screen_loaded");
+
     const checkLoginStatus = async () => {
       try {
         const API_URL = process.env.EXPO_PUBLIC_URL;
@@ -26,20 +53,24 @@ const SplashScreen = () => {
         }
 
         const data = await response.json();
-        await AsyncStorage.setItem("user_uuid", data.session.user.id);
-        await AsyncStorage.setItem("userEmail", data.session.user.email);
-        data.isLoggedIn =
-          true && data.session?.user?.email
-            ? navigation.navigate("Dashboard", {
-                email: data.session.user.email,
-                user_uuid: data.session.user.id,
-              })
-            : navigation.navigate("Auth");
+        const { session } = data;
+
+        if (session?.user?.email && session.user.id) {
+          await AsyncStorage.setItem("user_uuid", session.user.id);
+          await AsyncStorage.setItem("userEmail", session.user.email);
+          await handleTrackingConsent(session.user.email);
+          console.log("TRACKING CONSENT COMPLETED", data);
+
+          navigation.navigate("Dashboard", {
+            email: session.user.email,
+            user_uuid: session.user.id,
+          });
+        } else {
+          console.log("Session or user data missing, navigating to Auth.");
+          navigation.navigate("Auth");
+        }
       } catch (error) {
-        console.error(
-          "Error checking login status:",
-          error instanceof Error ? error.message : String(error)
-        );
+        console.error("Error checking login status:", error);
         navigation.navigate("Auth");
       }
     };
@@ -51,9 +82,7 @@ const SplashScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Buss'd</Text>
       <Text style={styles.subtitle}>How many bus routes have you taken?</Text>
-      {isLoggedIn === null && (
-        <Text style={styles.loading}>Checking login status...</Text>
-      )}
+      <Text style={styles.loading}>Checking login status...</Text>
     </View>
   );
 };
