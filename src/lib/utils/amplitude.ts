@@ -1,7 +1,16 @@
-import { init, track } from '@amplitude/analytics-react-native';
+import { init, setUserId, track } from '@amplitude/analytics-react-native';
 
-export const initAmplitude = (apiKey: string) => {
-  init(apiKey);
+let isInitialized = false;
+
+export const initAmplitude = async (apiKey: string) => {
+  if (!isInitialized) {
+    await init(apiKey);
+    isInitialized = true;
+  }
+};
+
+export const setAmplitudeUserId = (userId: string) => {
+  setUserId(userId);
 };
 
 export const trackEvent = (eventName: string, eventProperties?: Record<string, any>) => {

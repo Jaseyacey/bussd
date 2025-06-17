@@ -8,3 +8,10 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   multiSet: jest.fn(),
   multiRemove: jest.fn(),
 }));
+
+jest.mock("expo-tracking-transparency", () => ({
+  requestTrackingPermissionsAsync: jest
+    .fn()
+    .mockResolvedValue({ status: "granted" }),
+  getTrackingPermissionsAsync: jest.fn(),
+}));

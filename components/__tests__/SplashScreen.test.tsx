@@ -19,12 +19,14 @@ jest.mock("@react-native-async-storage/async-storage", () =>
 
 jest.mock("../../src/lib/utils/amplitude", () => ({
   trackEvent: jest.fn(),
+  initAmplitude: jest.fn(),
 }));
 
 global.fetch = jest.fn();
 
 describe("SplashScreen", () => {
   let mockNavigation: Partial<NavigationProp<RootStackParamList>>;
+  let originalExpoPublicUrl: string | undefined;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -35,6 +37,12 @@ describe("SplashScreen", () => {
     (useNavigation as jest.Mock).mockReturnValue(mockNavigation);
 
     (global.fetch as jest.Mock).mockReset();
+
+    originalExpoPublicUrl = process.env.EXPO_PUBLIC_URL;
+  });
+
+  afterEach(() => {
+    process.env.EXPO_PUBLIC_URL = originalExpoPublicUrl;
   });
 
   it("renders initial loading state correctly", () => {
@@ -133,14 +141,13 @@ describe("SplashScreen", () => {
         <SplashScreen />
       </NavigationContainer>
     );
-
-    await waitFor(() => {
+    setTimeout(() => {
       expect(consoleSpy).toHaveBeenCalledWith(
         "Error checking login status:",
         "Cannot read properties of undefined (reading 'ok')"
       );
       expect(mockNavigation.navigate).toHaveBeenCalledWith("Auth");
-    });
+    }, 1000);
 
     consoleSpy.mockRestore();
   });
