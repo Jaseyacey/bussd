@@ -69,6 +69,9 @@ const UserProfileScreen = ({ navigation }: UserProfileScreenProps) => {
 
   const handlePress = (id: string) => {
     switch (id) {
+      case "profile":
+        navigation.navigate("ProfileScreen");
+        break;
       case "logout":
         navigation.navigate("SignInScreen");
         break;
